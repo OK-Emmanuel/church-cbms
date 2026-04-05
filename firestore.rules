@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ────────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function currentUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && currentUserData().role == 'admin';
+    }
+
+    function isLeader() {
+      return isSignedIn() && currentUserData().role == 'leader';
+    }
+
+    function isLeaderForMonth(birthMonth) {
+      return isLeader() && currentUserData().assigned_month == birthMonth;
+    }
+
+    // ── Submissions ─────────────────────────────────────────────────────────
+    // Public users may CREATE; leaders manage their own month; admin has full access.
+    match /submissions/{submissionId} {
+      allow create: if true;
+
+      allow read, update:
+        if isLeaderForMonth(resource.data.birth_month) || isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ── Months ──────────────────────────────────────────────────────────────
+    // Any signed-in user may read; only admin may write.
+    match /months/{monthId} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ── Users ───────────────────────────────────────────────────────────────
+    // Any authenticated user may read (needed for admin to list leaders).
+    // A user may write their own record (e.g. on first login).
+    // Admin may write any user record (e.g. to change roles / assigned months).
+    match /users/{userId} {
+      allow read:   if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update, delete:
+        if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+    }
+  }
+}

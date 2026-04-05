@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Church CBMS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-purple-700 text-white py-4 px-6 shadow sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <h1 class="text-xl font-bold">🎂 CBMS Admin</h1>
+      <div class="flex items-center gap-4">
+        <span id="admin-name" class="text-sm text-purple-200"></span>
+        <button id="logout-btn" class="text-sm bg-purple-800 hover:bg-purple-900 px-3 py-1 rounded transition">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- Stats row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl shadow p-4 text-center">
+        <div class="text-3xl font-bold text-purple-600" id="stat-total">—</div>
+        <div class="text-sm text-gray-500">Total Submissions</div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 text-center">
+        <div class="text-3xl font-bold text-green-600" id="stat-complete">—</div>
+        <div class="text-sm text-gray-500">Complete</div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 text-center">
+        <div class="text-3xl font-bold text-yellow-500" id="stat-incomplete">—</div>
+        <div class="text-sm text-gray-500">Incomplete</div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 text-center">
+        <div class="text-3xl font-bold text-blue-600">12</div>
+        <div class="text-sm text-gray-500">Months</div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="flex gap-2 mb-6 flex-wrap">
+      <button class="tab-btn bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium" data-tab="submissions">
+        Submissions
+      </button>
+      <button class="tab-btn bg-white text-gray-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium border" data-tab="leaders">
+        Month Leaders
+      </button>
+      <button class="tab-btn bg-white text-gray-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium border" data-tab="users">
+        Users
+      </button>
+    </div>
+
+    <!-- ── TAB: Submissions ────────────────────────────────────────────────── -->
+    <div id="tab-submissions" class="tab-content">
+      <!-- Filters & Actions -->
+      <div class="bg-white rounded-xl shadow p-4 mb-4 flex flex-wrap gap-3 items-center">
+        <select
+          id="month-filter"
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+        >
+          <option value="">All Months</option>
+        </select>
+        <input
+          type="text" id="search-input" placeholder="Search by name…"
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex-1 min-w-40"
+        />
+        <button
+          id="export-btn"
+          class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition"
+        >
+          📥 Export CSV
+        </button>
+        <button
+          id="add-record-btn"
+          class="bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition"
+        >
+          + Add Record
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b">
+              <tr>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Photo</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Name</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Date of Birth</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Month</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Status</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="submissions-tbody">
+              <tr>
+                <td colspan="6" class="text-center py-10 text-gray-400">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: Month Leaders ─────────────────────────────────────────────── -->
+    <div id="tab-leaders" class="tab-content hidden">
+      <div id="month-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- ── TAB: Users ─────────────────────────────────────────────────────── -->
+    <div id="tab-users" class="tab-content hidden">
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b">
+              <tr>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Name</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Email</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Role</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Assigned Month</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr>
+                <td colspan="5" class="text-center py-10 text-gray-400">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Modal: Edit / Add Submission ────────────────────────────────────── -->
+  <div id="record-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 flex">
+    <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <h3 class="text-lg font-bold text-gray-800 mb-4" id="modal-title">Edit Record</h3>
+      <form id="record-form" novalidate class="space-y-4">
+        <input type="hidden" id="record-id" />
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Full Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text" id="record-name" required
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Date of Birth <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="date" id="record-dob" required
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Photo</label>
+          <div class="flex items-center gap-3">
+            <img id="record-photo-preview" class="h-16 w-16 object-cover rounded-lg border hidden" alt="Current photo" />
+            <div class="flex-1">
+              <input type="file" id="record-photo" accept="image/jpeg,image/png" class="text-sm" />
+              <p class="text-xs text-gray-400 mt-1">JPG or PNG · replaces current photo</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button
+            type="button" id="modal-cancel"
+            class="flex-1 border border-gray-300 text-gray-600 py-2 rounded-lg text-sm hover:bg-gray-50 transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit" id="modal-save"
+            class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm font-medium transition disabled:opacity-60"
+          >
+            Save
+          </button>
+        </div>
+
+        <p id="modal-message" class="hidden text-sm text-center"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Modal: Assign Leader to Month ──────────────────────────────────── -->
+  <div id="leader-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 flex">
+    <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">Assign Leader</h3>
+      <p class="text-sm text-gray-500 mb-4">
+        Month: <span id="assign-month-name" class="font-semibold text-purple-600"></span>
+      </p>
+      <input type="hidden" id="assign-month-id" />
+
+      <label class="block text-sm font-medium text-gray-700 mb-1">Select Leader</label>
+      <select
+        id="leader-select"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      >
+        <option value="">— No Leader —</option>
+      </select>
+
+      <div class="flex gap-3">
+        <button
+          id="leader-modal-cancel"
+          class="flex-1 border border-gray-300 text-gray-600 py-2 rounded-lg text-sm hover:bg-gray-50 transition"
+        >
+          Cancel
+        </button>
+        <button
+          id="leader-modal-save"
+          class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm font-medium transition"
+        >
+          Assign
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Edit User Role ──────────────────────────────────────────── -->
+  <div id="user-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 flex">
+    <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+      <h3 class="text-lg font-bold text-gray-800 mb-4">Edit User</h3>
+      <input type="hidden" id="edit-user-id" />
+
+      <p class="text-sm text-gray-600 mb-1">User: <span id="edit-user-name" class="font-semibold"></span></p>
+
+      <label class="block text-sm font-medium text-gray-700 mt-3 mb-1">Role</label>
+      <select
+        id="edit-user-role"
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      >
+        <option value="leader">Leader</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <div class="flex gap-3">
+        <button
+          id="user-modal-cancel"
+          class="flex-1 border border-gray-300 text-gray-600 py-2 rounded-lg text-sm hover:bg-gray-50 transition"
+        >
+          Cancel
+        </button>
+        <button
+          id="user-modal-save"
+          class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm font-medium transition"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

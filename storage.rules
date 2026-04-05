@@ -1,0 +1,16 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Member-submitted photos ────────────────────────────────────────────────
+    // Public writes are allowed but restricted to JPEG/PNG images under 10 MB.
+    // Everyone may read (photos are displayed in dashboards).
+    match /photos/{fileName} {
+      allow read: if true;
+
+      allow write:
+        if request.resource.contentType.matches('image/(jpeg|png)')
+        && request.resource.size <= 10 * 1024 * 1024;
+    }
+  }
+}
