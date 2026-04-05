@@ -312,9 +312,9 @@ recordForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  const dobDate = new Date(dob + 'T00:00:00');
-  const birthMonth = dobDate.getMonth() + 1;
-  const birthMonthName = MONTHS[dobDate.getMonth()];
+  // Derive birth month directly from the YYYY-MM-DD string to avoid timezone shifts.
+  const birthMonth = parseInt(dob.split('-')[1], 10);
+  const birthMonthName = MONTHS[birthMonth - 1];
 
   let photoUrl = id ? (allSubmissions.find((s) => s.id === id)?.photo_url || '') : '';
   let photoStoragePath = id ? (allSubmissions.find((s) => s.id === id)?.photo_storage_path || '') : '';

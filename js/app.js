@@ -4,8 +4,10 @@ import { getStorage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-s
 import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Replace these placeholder values with your Firebase project configuration.
-// You can find them in: Firebase Console → Project Settings → Your apps → SDK setup
+// ⚠️  REQUIRED: Replace ALL placeholder values below with your Firebase project
+// configuration before the application will work.
+// Location: Firebase Console → Project Settings → Your apps → SDK setup & config
+// See README.md → Setup → Step 2 for detailed instructions.
 // ──────────────────────────────────────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: 'YOUR_API_KEY',
@@ -61,12 +63,16 @@ export function getStatusBadge(status) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Format a date string (YYYY-MM-DD) for display
+// Format a date string (YYYY-MM-DD) for display — uses UTC to prevent day/month
+// shifts caused by local timezone offsets.
 // ──────────────────────────────────────────────────────────────────────────────
 export function formatDate(dateString) {
   if (!dateString) return '—';
-  const date = new Date(dateString + 'T00:00:00');
-  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.toLocaleDateString('en-US', {
+    month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC',
+  });
 }
 
 // ──────────────────────────────────────────────────────────────────────────────

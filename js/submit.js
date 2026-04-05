@@ -112,10 +112,10 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Derive birth month from the date-of-birth
-  const dobDate = new Date(dob + 'T00:00:00');
-  const birthMonth = dobDate.getMonth() + 1; // 1–12
-  const birthMonthName = MONTHS[dobDate.getMonth()];
+  // Derive birth month directly from the YYYY-MM-DD string — avoids timezone
+  // shifts that can occur when constructing a Date object from a date string.
+  const birthMonth = parseInt(dob.split('-')[1], 10); // 1–12
+  const birthMonthName = MONTHS[birthMonth - 1];
 
   setSaving('Uploading photo…');
 

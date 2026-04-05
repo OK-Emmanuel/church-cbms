@@ -24,9 +24,17 @@ service cloud.firestore {
     }
 
     // ── Submissions ─────────────────────────────────────────────────────────
-    // Public users may CREATE; leaders manage their own month; admin has full access.
+    // Public users may CREATE, with basic field validation to reduce spam.
+    // Leaders manage their own month; admin has full access.
     match /submissions/{submissionId} {
-      allow create: if true;
+      allow create: if request.resource.data.keys().hasAll(['name', 'date_of_birth', 'birth_month'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 200
+        && request.resource.data.date_of_birth is string
+        && request.resource.data.birth_month is int
+        && request.resource.data.birth_month >= 1
+        && request.resource.data.birth_month <= 12;
 
       allow read, update:
         if isLeaderForMonth(resource.data.birth_month) || isAdmin();

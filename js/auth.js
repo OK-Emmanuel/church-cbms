@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const loginForm = document.getElementById('login-form');
@@ -52,7 +53,7 @@ async function ensureUserRecord(user) {
       name: user.displayName || user.email.split('@')[0],
       role: 'leader',
       assigned_month: null,
-      created_at: new Date().toISOString(),
+      created_at: serverTimestamp(),
     });
   }
 }
